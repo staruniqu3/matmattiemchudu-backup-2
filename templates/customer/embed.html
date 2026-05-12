@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu khách hàng - Mát Mát</title>
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .embed-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .embed-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .embed-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+        
+        .embed-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="embed-container">
+        <div class="embed-header">
+            <div class="embed-logo">
+                <i class="fas fa-store"></i>
+                Mát Mát Tiệm Chu Du
+            </div>
+            <div class="embed-subtitle">
+                Tra cứu thông tin khách hàng
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <form id="customer-lookup-form" method="POST" action="{{ url_for('customer.lookup_customer') }}">
+                    <div class="form-group mb-3">
+                        <label for="customer-code" class="form-label">
+                            <i class="fas fa-barcode"></i>
+                            Mã khách hàng
+                        </label>
+                        <input type="text" 
+                               id="customer-code" 
+                               name="customer_code" 
+                               class="form-control" 
+                               placeholder="Nhập mã khách hàng..."
+                               autocomplete="off"
+                               required>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" id="lookup-btn" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                            Tra cứu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Customer result will be displayed here -->
+        <div id="customer-result" style="display: none;"></div>
+        
+        <!-- Display customer data if available -->
+        {% if customer_data %}
+        <div class="customer-info mt-3">
+            <div class="customer-header">
+                <div>
+                    <h4>{{ customer_data.name or 'Không có tên' }}</h4>
+                    {% if customer_data.facebook_name %}
+                    <p style="margin: 0.2rem 0 0.2rem 0; font-size: 0.9rem; color: #6c757d;">Facebook: {{ customer_data.facebook_name }}</p>
+                    {% endif %}
+                    <p class="text-muted">Mã khách hàng: {{ customer_data.code }}</p>
+                </div>
+            </div>
+            <div class="customer-details">
+                <div class="detail-item">
+                    <i class="fas fa-coins text-warning"></i>
+                    <span class="detail-label">Điểm:</span>
+                    <span class="points-badge">{{ customer_data.points or '0' }}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-crown text-warning"></i>
+                    <span class="detail-label">Hạng:</span>
+                    <span class="rank-badge">{{ customer_data.rank or 'Thành viên' }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

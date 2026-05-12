@@ -1,0 +1,23 @@
+{
+  "name": "Mát Mát Tiệm Chu Du",
+  "short_name": "Mát Mát",
+  "description": "Hệ thống tra cứu thông tin khách hàng và vận đơn",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1E3A8A",
+  "theme_color": "#FF6B35",
+  "icons": [
+    {
+      "src": "/static/images/mat-mat-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/images/mat-mat-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "lang": "vi",
+  "orientation": "portrait-primary"
+}

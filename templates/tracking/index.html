@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Tra cứu vận đơn - Mát Mát{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-shipping-fast"></i>
+                    Tra cứu vận đơn
+                </h2>
+            </div>
+            <div class="card-body">
+                <form id="tracking-form" method="POST" action="{{ url_for('tracking.search_package') }}">
+                    <div class="form-group">
+                        <label for="tracking-number" class="form-label">
+                            <i class="fas fa-search"></i>
+                            Mã vận đơn hoặc Mã khách hàng
+                        </label>
+                        <input type="text" 
+                               id="tracking-number" 
+                               name="tracking_number" 
+                               class="form-control" 
+                               placeholder="Nhập mã vận đơn hoặc mã khách hàng (VD: SPX025552322 hoặc TCD1001025001)..."
+                               autocomplete="off"
+                               required>
+                        <div class="form-text">
+                            Nhập mã vận đơn hoặc mã khách hàng để tra cứu tình trạng giao hàng và thông tin thành viên
+                        </div>
+                        <div id="detection-result" class="mt-2"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="provider" class="form-label">
+                            <i class="fas fa-truck"></i>
+                            Đơn vị vận chuyển
+                        </label>
+                        <select id="provider" name="provider" class="form-control">
+                            <option value="auto">Tự động nhận diện</option>
+                            <option value="vietnampost">Bưu điện Việt Nam</option>
+                            <option value="viettelpost">Viettel Post</option>
+                            <option value="ghn">Giao hàng nhanh (GHN)</option>
+                            <option value="ghtk">Giao hàng tiết kiệm (GHTK)</option>
+                            <option value="jnt">J&T Express</option>
+                            <option value="shopee">Shopee Express</option>
+                        </select>
+                        <div class="form-text">
+                            Chọn đơn vị vận chuyển hoặc để hệ thống tự động nhận diện
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" id="track-btn" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search"></i>
+                            <span id="track-btn-text">Tra cứu đơn hàng</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tracking result will be displayed here -->
+        <div id="tracking-result" style="display: none;"></div>
+    </div>
+</div>
+
+<!-- Information cards -->
+<div class="row mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Hướng dẫn tra cứu
+                </h5>
+            </div>
+            <div class="card-body">
+                <ol class="text-muted">
+                    <li>Nhập mã vận đơn vào ô tìm kiếm</li>
+                    <li>Chọn đơn vị vận chuyển (hoặc để tự động)</li>
+                    <li>Nhấn nút "Tra cứu vận đơn"</li>
+                    <li>Xem thông tin chi tiết về tình trạng giao hàng</li>
+                </ol>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>Mẹo:</strong> Hệ thống có thể tự động nhận diện đơn vị vận chuyển 
+                    dựa trên định dạng mã vận đơn.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-truck"></i>
+                    Đơn vị vận chuyển hỗ trợ
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="provider-list">
+                    <div class="provider-item">
+                        <i class="fas fa-shipping-fast text-primary"></i>
+                        <strong>Bưu điện Việt Nam</strong>
+                        <br>
+                        <small class="text-muted">Mã bắt đầu: RC, RG, RA, CC, CP, CD</small>
+                    </div>
+                    
+                    <div class="provider-item">
+                        <i class="fas fa-shipping-fast text-success"></i>
+                        <strong>Giao hàng nhanh (GHN)</strong>
+                        <br>
+                        <small class="text-muted">Mã bắt đầu: GHN hoặc 13 ký tự</small>
+                    </div>
+                    
+                    <div class="provider-item">
+                        <i class="fas fa-shipping-fast text-warning"></i>
+                        <strong>Giao hàng tiết kiệm (GHTK)</strong>
+                        <br>
+                        <small class="text-muted">Mã bắt đầu: GHTK hoặc 12 ký tự</small>
+                    </div>
+                    
+                    <div class="provider-item">
+                        <i class="fas fa-shipping-fast text-info"></i>
+                        <strong>J&T Express</strong>
+                        <br>
+                        <small class="text-muted">Mã bắt đầu: JT hoặc 14 ký tự</small>
+                    </div>
+                    
+                    <div class="provider-item">
+                        <i class="fas fa-shipping-fast text-danger"></i>
+                        <strong>Shopee Express</strong>
+                        <br>
+                        <small class="text-muted">Mã bắt đầu: SPXVN hoặc 19 ký tự</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/tracking.js') }}"></script>
+
+<style>
+.provider-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.provider-item:last-child {
+    border-bottom: none;
+}
+
+.provider-item i {
+    margin-right: 10px;
+}
+
+code {
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.alert {
+    border-left: 4px solid;
+}
+
+.alert-info {
+    border-left-color: #17a2b8;
+}
+</style>
+
+<script>
+// Enhanced tracking form with auto-detection
+document.addEventListener('DOMContentLoaded', function() {
+    const trackingInput = document.getElementById('tracking-number');
+    const providerSelect = document.getElementById('provider');
+    const form = document.getElementById('tracking-form');
+    
+    // Auto-uppercase and clean input
+    trackingInput.addEventListener('input', function(e) {
+        let value = e.target.value.toUpperCase().replace(/\s+/g, '');
+        e.target.value = value;
+    });
+    
+    // Enter key handling
+    trackingInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            form.dispatchEvent(new Event('submit'));
+        }
+    });
+    
+    // Clear previous results when typing
+    trackingInput.addEventListener('input', function() {
+        const resultContainer = document.getElementById('tracking-result');
+        if (resultContainer) {
+            resultContainer.style.display = 'none';
+        }
+        
+        const detectionResult = document.getElementById('detection-result');
+        if (detectionResult) {
+            detectionResult.innerHTML = '';
+        }
+    });
+    
+    // Sample tracking codes for testing
+    const sampleCodes = {
+        'vietnampost': 'RC123456789VN',
+        'ghn': 'GHN123456789',
+        'ghtk': 'GHTK987654321',
+        'jnt': 'JT123456789012',
+        'shopee': 'SPXVN123456789012345'
+    };
+    
+    // Add quick test buttons (for development)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const testButtons = document.createElement('div');
+        testButtons.className = 'mt-3';
+        testButtons.innerHTML = '<small class="text-muted">Test codes: </small>';
+        
+        Object.entries(sampleCodes).forEach(([provider, code]) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-sm btn-outline-secondary me-2';
+            btn.textContent = provider.toUpperCase();
+            btn.onclick = () => {
+                trackingInput.value = code;
+                providerSelect.value = provider;
+                trackingInput.dispatchEvent(new Event('input'));
+            };
+            testButtons.appendChild(btn);
+        });
+        
+        trackingInput.parentNode.appendChild(testButtons);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Kết quả tra cứu vận đơn - Mát Mát{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Back button -->
+        <div class="mb-3">
+            <a href="{{ url_for('tracking.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i>
+                Tra cứu mới
+            </a>
+        </div>
+        
+        <!-- Main tracking result -->
+        <div class="tracking-result-enhanced" style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #e9ecef;">
+            <!-- Modern header with gradient background -->
+            <div class="tracking-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; opacity: 0.5;"></div>
+                <div style="position: absolute; bottom: -30px; left: -30px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; opacity: 0.3;"></div>
+                
+                <div style="position: relative; z-index: 2;">
+                    <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem;">
+                        <div class="tracking-icon" style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; backdrop-filter: blur(10px);">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div>
+                            <h2 style="margin: 0 0 0.5rem 0; font-size: 1.8rem; font-weight: 700;">{{ tracking_data.tracking_number }}</h2>
+                            {% if tracking_data.customer_data and tracking_data.customer_data.code %}
+                            <p style="margin: 0; opacity: 0.9; font-size: 1rem;">Khách hàng: {{ tracking_data.customer_data.code }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <div class="status-badge" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: 
+                            {% if tracking_data.status and ('giao' in tracking_data.status.lower() or 'delivered' in tracking_data.status.lower()) %}
+                                rgba(40,167,69,0.2)
+                            {% elif tracking_data.status and ('đang' in tracking_data.status.lower() or 'processing' in tracking_data.status.lower()) %}
+                                rgba(255,193,7,0.2)
+                            {% else %}
+                                rgba(108,117,125,0.2)
+                            {% endif %}
+                        ; border-radius: 25px; font-size: 0.9rem; font-weight: 600; backdrop-filter: blur(10px);">
+                            <i class="fas fa-truck"></i>
+                            {{ tracking_data.status or 'Chưa cập nhật' }}
+                        </div>
+                        
+                        {% if tracking_data.shipping_provider %}
+                        <div class="provider-badge" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 25px; font-size: 0.9rem; font-weight: 600; backdrop-filter: blur(10px);">
+                            <i class="fas fa-truck-moving"></i>
+                            {{ tracking_data.shipping_provider }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if tracking_data.customer_data and tracking_data.customer_data.rank %}
+                        <div class="rank-badge" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 25px; font-size: 0.9rem; font-weight: 600; backdrop-filter: blur(10px);">
+                            <i class="fas fa-crown"></i>
+                            {{ tracking_data.customer_data.rank }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if tracking_data.shipping_fee %}
+                        <div class="shipping-fee-badge" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 25px; font-size: 0.9rem; font-weight: 600; backdrop-filter: blur(10px);">
+                            <i class="fas fa-money-bill-wave"></i>
+                            {{ tracking_data.shipping_fee }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+
+            
+            <!-- Customer and delivery information -->
+            <div class="tracking-info-section" style="margin: 2rem; padding: 0;">
+                <h5 style="margin: 0 0 1.5rem 0; color: #2c3e50; font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-info-circle" style="color: #ff6b35;"></i>
+                    Chi tiết đơn hàng
+                </h5>
+                
+                <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                    {% if tracking_data.customer_name or tracking_data.customer_phone %}
+                    <div class="info-group" style="background: #f8f9fa; padding: 1.5rem; border-radius: 15px; border-left: 4px solid #667eea;">
+                        <h6 style="margin: 0 0 1rem 0; color: #2c3e50; font-weight: 600; font-size: 1rem;">
+                            <i class="fas fa-user" style="color: #667eea; margin-right: 0.5rem;"></i>
+                            Thông tin khách hàng
+                        </h6>
+                        {% if tracking_data.customer_data and tracking_data.customer_data.name %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500; color: #6c757d;">Tên khách hàng:</span>
+                            <span style="color: #495057; margin-left: 0.5rem;">{{ tracking_data.customer_data.name }}</span>
+                        </div>
+                        {% endif %}
+                        {% if tracking_data.customer_data and tracking_data.customer_data.facebook_name %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500; color: #6c757d;">Facebook Name:</span>
+                            <span style="color: #495057; margin-left: 0.5rem;">{{ tracking_data.customer_data.facebook_name }}</span>
+                        </div>
+                        {% endif %}
+                        {% if tracking_data.customer_phone %}
+                        <div>
+                            <span style="font-weight: 500; color: #6c757d;">SĐT:</span>
+                            <span style="color: #495057; margin-left: 0.5rem;">{{ tracking_data.customer_phone }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if tracking_data.product_name or tracking_data.total_amount %}
+                    <div class="info-group" style="background: #f8f9fa; padding: 1.5rem; border-radius: 15px; border-left: 4px solid #4facfe;">
+                        <h6 style="margin: 0 0 1rem 0; color: #2c3e50; font-weight: 600; font-size: 1rem;">
+                            <i class="fas fa-box" style="color: #4facfe; margin-right: 0.5rem;"></i>
+                            Thông tin sản phẩm
+                        </h6>
+                        {% if tracking_data.product_name %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500; color: #6c757d;">Sản phẩm:</span>
+                            <span style="color: #495057; margin-left: 0.5rem;">{{ tracking_data.product_name }}</span>
+                        </div>
+                        {% endif %}
+                        {% if tracking_data.total_amount %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500; color: #6c757d;">Tổng tiền:</span>
+                            <span style="color: #495057; margin-left: 0.5rem; font-weight: 600;">{{ tracking_data.total_amount }}</span>
+                        </div>
+                        {% endif %}
+                        {% if tracking_data.shipping_fee %}
+                        <div>
+                            <span style="font-weight: 500; color: #6c757d;">Cước phí vận chuyển:</span>
+                            <span style="color: #ff6b35; margin-left: 0.5rem; font-weight: 600;">{{ tracking_data.shipping_fee }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if tracking_data.order_date or tracking_data.delivery_date %}
+                    <div class="info-group" style="background: #f8f9fa; padding: 1.5rem; border-radius: 15px; border-left: 4px solid #fa709a;">
+                        <h6 style="margin: 0 0 1rem 0; color: #2c3e50; font-weight: 600; font-size: 1rem;">
+                            <i class="fas fa-calendar-alt" style="color: #fa709a; margin-right: 0.5rem;"></i>
+                            Thông tin thời gian
+                        </h6>
+                        {% if tracking_data.order_date %}
+                        <div style="margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500; color: #6c757d;">Ngày đặt:</span>
+                            <span style="color: #495057; margin-left: 0.5rem;">{{ tracking_data.order_date }}</span>
+                        </div>
+                        {% endif %}
+                        {% if tracking_data.delivery_date %}
+                        <div>
+                            <span style="font-weight: 500; color: #6c757d;">Ngày giao:</span>
+                            <span style="color: #495057; margin-left: 0.5rem;">{{ tracking_data.delivery_date }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Address and notes information -->
+            <div class="additional-info" style="margin: 2rem;">
+                {% if tracking_data.address %}
+                <div class="address-section" style="margin-bottom: 1.5rem; padding: 1.5rem; background: #f8f9fa; border-radius: 15px; border-left: 4px solid #f093fb;">
+                    <h6 style="margin: 0 0 1rem 0; color: #2c3e50; font-weight: 600; font-size: 1rem;">
+                        <i class="fas fa-map-marker-alt" style="color: #f093fb; margin-right: 0.5rem;"></i>
+                        Địa chỉ giao hàng
+                    </h6>
+                    <p style="margin: 0; color: #495057; line-height: 1.5;">{{ tracking_data.address }}</p>
+                </div>
+                {% endif %}
+                
+                {% if tracking_data.notes %}
+                <div class="notes-section" style="padding: 1.5rem; background: #fff3cd; border-radius: 15px; border-left: 4px solid #ffc107;">
+                    <h6 style="margin: 0 0 0.5rem 0; color: #856404; font-weight: 600; font-size: 1rem;">
+                        <i class="fas fa-sticky-note" style="color: #ffc107; margin-right: 0.5rem;"></i>
+                        Ghi chú
+                    </h6>
+                    <p style="margin: 0; color: #856404; line-height: 1.5;">{{ tracking_data.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Last updated -->
+            <div class="last-updated" style="margin: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center; border: 1px solid #e9ecef;">
+                <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+                    <i class="fas fa-clock" style="margin-right: 0.5rem;"></i>
+                    Cập nhật lần cuối: Vừa xong
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

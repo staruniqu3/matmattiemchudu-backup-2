@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Tra cứu khách hàng - Mát Mát{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-users"></i>
+                    Tra cứu thông tin khách hàng
+                </h2>
+            </div>
+            <div class="card-body">
+                <form id="customer-lookup-form" method="POST" action="{{ url_for('customer.lookup_customer') }}">
+                    <div class="form-group">
+                        <label for="customer-code" class="form-label">
+                            <i class="fas fa-barcode"></i>
+                            Mã khách hàng
+                        </label>
+                        <input type="text" 
+                               id="customer-code" 
+                               name="customer_code" 
+                               class="form-control" 
+                               placeholder="Nhập mã khách hàng..."
+                               value="{{ searched_code or '' }}"
+                               autocomplete="off"
+                               required>
+                        <div class="form-text">
+                            Nhập mã khách hàng để tra cứu thông tin thành viên
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" id="lookup-btn" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search"></i>
+                            <span id="btn-text">Tra cứu</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Customer result will be displayed here -->
+        <div id="customer-result" style="display: none;"></div>
+        
+        <!-- Display customer data if available -->
+        {% if customer_data %}
+        <div class="customer-info-enhanced" style="display: block !important; margin-top: 2rem; background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); border: 2px solid #f0f0f0;">
+            <div class="customer-header" style="display: flex; align-items: center; margin-bottom: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 15px; border: 1px solid #e9ecef;">
+                <div class="customer-main-info">
+                    <div style="margin-bottom: 0.5rem;">
+                        <h3 style="margin: 0 0 0.3rem 0; font-size: 1.8rem; font-weight: 700; color: #2c3e50;">{{ customer_data.name or 'Không có tên' }}</h3>
+                        {% if customer_data.facebook_name %}
+                        <p style="margin: 0 0 0.5rem 0; font-size: 1rem; color: #6c757d; font-weight: 500;">Facebook: {{ customer_data.facebook_name }}</p>
+                        {% endif %}
+                        <p class="customer-code" style="margin: 0 0 0.8rem 0; font-size: 1rem; color: #6c757d; font-weight: 500;">Mã khách hàng: {{ customer_data.code }}</p>
+                        {% if customer_data.birthday %}
+                        <div class="birthday-badge" style="display: inline-block; padding: 0.3rem 0.8rem; background: linear-gradient(135deg, #ff6b35, #ff8c42); color: white; border-radius: 20px; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 8px rgba(255,107,53,0.3);">
+                            <i class="fas fa-birthday-cake" style="margin-right: 0.3rem;"></i>
+                            {{ customer_data.birthday }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="membership-tier">
+                        <span class="tier-badge tier-{{ customer_data.rank.lower() if customer_data.rank else 'basic' }}" style="background: linear-gradient(135deg, #dc3545, #e55563); color: white; padding: 0.5rem 1rem; border-radius: 25px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 8px rgba(220,53,69,0.3);">
+                            <i class="fas fa-crown"></i>
+                            {{ customer_data.rank or 'Thành viên' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="customer-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                <div class="stat-card" style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; border: 2px solid #e9ecef; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="stat-icon" style="font-size: 2rem; color: #ff6b35; margin-bottom: 1rem;">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4 style="font-size: 1.5rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.3rem;">{{ customer_data.points or '0' }}</h4>
+                        <p style="color: #6c757d; margin: 0; font-weight: 500;">Điểm tích lũy</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card" style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; border: 2px solid #e9ecef; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="stat-icon" style="font-size: 2rem; color: #ff6b35; margin-bottom: 1rem;">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4 style="font-size: 1.5rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.3rem;">{{ customer_data.rank or 'Thành viên' }}</h4>
+                        <p style="color: #6c757d; margin: 0; font-weight: 500;">Hạng thành viên</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card" style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; border: 2px solid #e9ecef; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="stat-icon" style="font-size: 2rem; color: #ff6b35; margin-bottom: 1rem;">
+                        <i class="fas fa-calendar-year"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4 style="font-size: 1.5rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.3rem;">{{ customer_data.yearly_points or '0' }}</h4>
+                        <p style="color: #6c757d; margin: 0; font-weight: 500;">Điểm tích lũy trong năm</p>
+                    </div>
+                </div>
+                
+
+                
+                {% if customer_data.point_conversion %}
+                <div class="stat-card" style="background: white; padding: 1.5rem; border-radius: 12px; text-align: center; border: 2px solid #e9ecef; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="stat-icon" style="font-size: 2rem; color: #ff6b35; margin-bottom: 1rem;">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4 style="font-size: 1.5rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.3rem;">{{ customer_data.point_conversion }}</h4>
+                        <p style="color: #6c757d; margin: 0; font-weight: 500;">Quy đổi điểm</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Membership Benefits Button -->
+            <div class="membership-benefits-button" style="margin-top: 2rem; text-align: center;">
+                <a href="https://tiemchudu.com/sovereign-club/" target="_blank" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #ff6b35, #ff8c42); border: none; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600; border-radius: 50px; box-shadow: 0 4px 15px rgba(255,107,53,0.3); transition: all 0.3s ease; text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-gift" style="color: white;"></i>
+                    Xem Quyền lợi thành viên
+                </a>
+            </div>
+            
+            <!-- Voucher Information Section -->
+            <div class="voucher-section" style="margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 15px; border: 1px solid #e9ecef;">
+                <h5 style="margin-bottom: 1.5rem; color: #2c3e50; font-weight: 600;"><i class="fas fa-ticket-alt" style="color: white;"></i> Thông tin Vouchers</h5>
+                <div class="voucher-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                    
+                    <!-- Membership Vouchers -->
+                    <div class="voucher-card" style="background: white; padding: 1.5rem; border-radius: 12px; border: 2px solid #e9ecef; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                        <div class="voucher-header" style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <i class="fas fa-gift" style="font-size: 1.2rem; color: white; background: #28a745; padding: 0.5rem; border-radius: 50%; margin-right: 0.5rem;"></i>
+                            <h6 style="margin: 0; color: #2c3e50; font-weight: 600;">Vouchers ưu đãi cho Membership</h6>
+                        </div>
+                        <div class="voucher-content" style="padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+                            <p style="margin: 0; color: #495057; font-size: 0.95rem; font-weight: 500;">{{ customer_data.membership_vouchers or 'Chưa có voucher ưu đãi' }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Used Vouchers -->
+                    <div class="voucher-card" style="background: white; padding: 1.5rem; border-radius: 12px; border: 2px solid #e9ecef; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                        <div class="voucher-header" style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <i class="fas fa-check-circle" style="font-size: 1.2rem; color: white; background: #dc3545; padding: 0.5rem; border-radius: 50%; margin-right: 0.5rem;"></i>
+                            <h6 style="margin: 0; color: #2c3e50; font-weight: 600;">Vouchers đã sử dụng</h6>
+                        </div>
+                        <div class="voucher-content" style="padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #dc3545;">
+                            <p style="margin: 0; color: #495057; font-size: 0.95rem; font-weight: 500;">{{ customer_data.used_vouchers or 'Chưa sử dụng voucher nào' }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Remaining Vouchers -->
+                    <div class="voucher-card" style="background: white; padding: 1.5rem; border-radius: 12px; border: 2px solid #e9ecef; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                        <div class="voucher-header" style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <i class="fas fa-clock" style="font-size: 1.2rem; color: white; background: #ffc107; padding: 0.5rem; border-radius: 50%; margin-right: 0.5rem;"></i>
+                            <h6 style="margin: 0; color: #2c3e50; font-weight: 600;">Vouchers còn lại</h6>
+                        </div>
+                        <div class="voucher-content" style="padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #ffc107;">
+                            <p style="margin: 0; color: #495057; font-size: 0.95rem; font-weight: 500;">{{ customer_data.remaining_vouchers or 'Chưa có voucher còn lại' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Point Conversion Section -->
+            {% if customer_data.point_conversion %}
+            <div class="point-conversion-section">
+                <h5><i class="fas fa-exchange-alt"></i> Quy đổi điểm</h5>
+                <div class="conversion-info">
+                    <div class="conversion-card">
+                        <div class="conversion-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <div class="conversion-details">
+                            <h6>Thông tin quy đổi</h6>
+                            <p>{{ customer_data.point_conversion }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+
+            
+
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Help section -->
+<div class="row mt-5 justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-question-circle"></i>
+                    Hướng dẫn sử dụng
+                </h5>
+            </div>
+            <div class="card-body">
+                <ol class="text-muted">
+                    <li>Nhập mã khách hàng vào ô tìm kiếm</li>
+                    <li>Nhấn nút "Tra cứu" để tìm kiếm</li>
+                    <li>Xem thông tin điểm tích lũy và hạng thành viên</li>
+                    <li>Thông tin sẽ được cập nhật tự động</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Enhanced customer lookup with real-time features
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('customer-lookup-form');
+    const input = document.getElementById('customer-code');
+    const lookupBtn = document.getElementById('lookup-btn');
+    
+    // Reset button state if customer data exists (page loaded with results)
+    const customerData = {{ 'true' if customer_data else 'false' }};
+    if (lookupBtn && customerData) {
+        lookupBtn.disabled = false;
+        lookupBtn.classList.remove('btn-loading');
+        lookupBtn.innerHTML = '<i class="fas fa-search"></i> <span id="btn-text">Tra cứu</span>';
+    }
+    
+    // Auto-uppercase input
+    input.addEventListener('input', function(e) {
+        e.target.value = e.target.value.toUpperCase();
+    });
+    
+    // Enter key handling
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            form.dispatchEvent(new Event('submit'));
+        }
+    });
+    
+    // Clear previous results when typing
+    input.addEventListener('input', function() {
+        const resultContainer = document.getElementById('customer-result');
+        if (resultContainer) {
+            resultContainer.style.display = 'none';
+        }
+    });
+    
+    // Form submission handler
+    form.addEventListener('submit', function(e) {
+        if (lookupBtn) {
+            lookupBtn.disabled = true;
+            lookupBtn.classList.add('btn-loading');
+            lookupBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Điền Form Booking - Mát Mát Tiệm Chu Du{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Điền Form Booking Vé Events
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('booking.submit_event_booking') }}" id="eventBookingForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="name" class="form-label">
+                                        <i class="fas fa-user me-2"></i>
+                                        Họ và tên *
+                                    </label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>
+                                        Email *
+                                    </label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="phone" class="form-label">
+                                        <i class="fas fa-phone me-2"></i>
+                                        Số điện thoại *
+                                    </label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="event_type" class="form-label">
+                                        <i class="fas fa-tags me-2"></i>
+                                        Loại sự kiện *
+                                    </label>
+                                    <select class="form-select" id="event_type" name="event_type" required>
+                                        <option value="">Chọn loại sự kiện</option>
+                                        <option value="workshop">Workshop</option>
+                                        <option value="seminar">Seminar</option>
+                                        <option value="conference">Conference</option>
+                                        <option value="networking">Networking</option>
+                                        <option value="party">Party</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="event_date" class="form-label">
+                                        <i class="fas fa-calendar me-2"></i>
+                                        Ngày sự kiện *
+                                    </label>
+                                    <input type="date" class="form-control" id="event_date" name="event_date" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="participants" class="form-label">
+                                        <i class="fas fa-users me-2"></i>
+                                        Số lượng người tham gia *
+                                    </label>
+                                    <input type="number" class="form-control" id="participants" name="participants" min="1" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes" class="form-label">
+                                <i class="fas fa-comment me-2"></i>
+                                Ghi chú thêm
+                            </label>
+                            <textarea class="form-control" id="notes" name="notes" rows="4" placeholder="Thêm thông tin chi tiết về sự kiện, yêu cầu đặc biệt..."></textarea>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Gửi đơn đặt vé
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('booking.event') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('event_date').setAttribute('min', today);
+    
+    // Form validation
+    const form = document.getElementById('eventBookingForm');
+    form.addEventListener('submit', function(e) {
+        const requiredFields = ['name', 'email', 'phone', 'event_type', 'event_date', 'participants'];
+        let isValid = true;
+        
+        requiredFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Vui lòng điền đầy đủ thông tin bắt buộc.');
+        }
+    });
+    
+    // Remove validation error on input
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    });
+});
+</script>
+{% endblock %}

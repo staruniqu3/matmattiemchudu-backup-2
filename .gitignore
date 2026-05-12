@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.env
+.venv/
+venv/
+env/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Replit specific
+.upm/
+.cache/
+.config/
+.local/
+
+# Attached assets (binary/image files - not needed in git)
+attached_assets/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

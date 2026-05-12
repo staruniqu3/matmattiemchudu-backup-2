@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+
+{% block title %}Kết quả tra cứu vận đơn - Mát Mát{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Back button -->
+        <div class="mb-3">
+            <a href="{{ url_for('tracking.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i>
+                Tra cứu mới
+            </a>
+        </div>
+        
+        <!-- Main tracking result -->
+        <div class="tracking-result">
+            <div class="tracking-header" style="background: {{ '#28a745' if tracking_data.is_delivered else '#007bff' }};">
+                <div class="tracking-status">
+                    <div class="status-icon">
+                        <i class="fas fa-{{ 'check-double' if tracking_data.is_delivered else 'truck' }}"></i>
+                    </div>
+                    <div>
+                        <div class="status-text">{{ tracking_data.status }}</div>
+                        <div class="status-subtitle">{{ tracking_data.provider_name }}</div>
+                    </div>
+                </div>
+                <div class="tracking-number">
+                    <div class="tracking-code">{{ tracking_data.tracking_number }}</div>
+                    <div class="tracking-time">
+                        Cập nhật: {{ tracking_data.last_updated if tracking_data.last_updated else 'Vừa xong' }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tracking-body">
+                <!-- Current information -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Vị trí hiện tại</div>
+                                <div class="info-value">{{ tracking_data.location or 'Chưa cập nhật' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Dự kiến giao hàng</div>
+                                <div class="info-value">
+                                    {{ tracking_data.estimated_delivery if tracking_data.estimated_delivery else 'Chưa xác định' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-{{ 'check-circle' if tracking_data.is_delivered else 'clock' }}"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Trạng thái</div>
+                                <div class="info-value">
+                                    {% if tracking_data.is_delivered %}
+                                        <span class="badge bg-success">Đã giao hàng</span>
+                                    {% else %}
+                                        <span class="badge bg-primary">Đang vận chuyển</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tracking history -->
+                {% if tracking_data.history %}
+                <div class="history-section">
+                    <h5 class="section-title">
+                        <i class="fas fa-history"></i>
+                        Lịch sử vận chuyển
+                    </h5>
+                    
+                    <div class="timeline">
+                        {% for event in tracking_data.history %}
+                        <div class="timeline-item {{ 'active' if loop.first else '' }}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <div class="timeline-status">{{ event.status }}</div>
+                                    <div class="timeline-time">
+                                        {{ event.time if event.time else 'Không xác định' }}
+                                    </div>
+                                </div>
+                                {% if event.description %}
+                                <div class="timeline-description">{{ event.description }}</div>
+                                {% endif %}
+                                {% if event.location %}
+                                <div class="timeline-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ event.location }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Actions -->
+                <div class="actions-section mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-primary w-100" onclick="window.print()">
+                                <i class="fas fa-print"></i>
+                                In thông tin
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-secondary w-100" onclick="shareTracking()">
+                                <i class="fas fa-share-alt"></i>
+                                Chia sẻ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional information -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title">
+                            <i class="fas fa-phone"></i>
+                            Liên hệ hỗ trợ
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">
+                            Nếu có vấn đề với đơn hàng, vui lòng liên hệ trực tiếp với đơn vị vận chuyển:
+                        </p>
+                        <div class="contact-info">
+                            <strong>{{ tracking_data.provider_name }}</strong>
+                            <br>
+                            {% if tracking_data.provider == 'vietnampost' %}
+                                Hotline: 1900 54 54 01
+                            {% elif tracking_data.provider == 'ghn' %}
+                                Hotline: 1900 1886
+                            {% elif tracking_data.provider == 'ghtk' %}
+                                Hotline: 1900 1887
+                            {% elif tracking_data.provider == 'jnt' %}
+                                Hotline: 1900 1886
+                            {% elif tracking_data.provider == 'shopee' %}
+                                Hotline: 1900 1221
+                            {% else %}
+                                Vui lòng kiểm tra website của đơn vị vận chuyển
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title">
+                            <i class="fas fa-info-circle"></i>
+                            Thông tin thêm
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled text-muted">
+                            <li><i class="fas fa-clock"></i> Thời gian cập nhật: Mỗi 30 phút</li>
+                            <li><i class="fas fa-sync-alt"></i> Dữ liệu được đồng bộ tự động</li>
+                            <li><i class="fas fa-shield-alt"></i> Thông tin được bảo mật</li>
+                            <li><i class="fas fa-mobile-alt"></i> Tương thích với mọi thiết bị</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.tracking-result {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.tracking-header {
+    color: white;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.tracking-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.status-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.status-subtitle {
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.tracking-number {
+    text-align: right;
+}
+
+.tracking-code {
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 0.25rem;
+}
+
+.tracking-time {
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.tracking-body {
+    padding: 2rem;
+}
+
+.info-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.info-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #ff6b35, #e55529);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #333;
+}
+
+.section-title {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -0.5rem;
+    top: 0.5rem;
+    width: 16px;
+    height: 16px;
+    background: #6c757d;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-item.active .timeline-dot {
+    background: #007bff;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-left: 1rem;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-status {
+    font-weight: 600;
+    color: #333;
+}
+
+.timeline-time {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.timeline-description {
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-location {
+    font-size: 0.9rem;
+    color: #007bff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.actions-section {
+    border-top: 1px solid #dee2e6;
+    padding-top: 1.5rem;
+}
+
+.contact-info {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .tracking-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .tracking-number {
+        text-align: center;
+    }
+    
+    .timeline-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .timeline-time {
+        align-self: flex-start;
+    }
+}
+
+/* Print styles */
+@media print {
+    .btn,
+    .actions-section,
+    .card-header {
+        display: none !important;
+    }
+    
+    .tracking-result {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+    
+    .tracking-header {
+        background: #f8f9fa !important;
+        color: #333 !important;
+    }
+}
+</style>
+
+<script>
+function shareTracking() {
+    const trackingNumber = "{{ tracking_data.tracking_number }}";
+    const url = window.location.href;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: `Tra cứu vận đơn ${trackingNumber}`,
+            text: `Thông tin vận đơn ${trackingNumber} từ {{ tracking_data.provider_name }}`,
+            url: url
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Đã sao chép link vào clipboard!');
+        });
+    }
+}
+
+// Auto-refresh every 5 minutes
+setInterval(() => {
+    if (!document.hidden) {
+        window.location.reload();
+    }
+}, 300000); // 5 minutes
+</script>
+{% endblock %}

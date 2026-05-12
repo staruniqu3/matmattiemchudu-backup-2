@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Mã nhúng - Tra cứu khách hàng{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-code"></i>
+                    Mã nhúng tra cứu khách hàng
+                </h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Sử dụng các mã nhúng dưới đây để tích hợp chức năng tra cứu khách hàng vào website của bạn.
+                </p>
+                
+                <!-- Standard HTML Embed -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-globe"></i> Mã HTML chuẩn</h5>
+                    <p class="text-muted">Sử dụng cho các website HTML thông thường:</p>
+                    <div class="code-container">
+                        <pre><code id="html-code">{{ embed_html }}</code></pre>
+                        <button class="btn btn-sm btn-outline-primary copy-btn" data-target="html-code">
+                            <i class="fas fa-copy"></i> Sao chép
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- WordPress Shortcode -->
+                <div class="mb-4">
+                    <h5><i class="fab fa-wordpress"></i> WordPress Shortcode</h5>
+                    <p class="text-muted">Sử dụng cho các website WordPress với plugin iframe:</p>
+                    <div class="code-container">
+                        <pre><code id="wp-shortcode">{{ wordpress_shortcode }}</code></pre>
+                        <button class="btn btn-sm btn-outline-primary copy-btn" data-target="wp-shortcode">
+                            <i class="fas fa-copy"></i> Sao chép
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- WordPress HTML Block -->
+                <div class="mb-4">
+                    <h5><i class="fab fa-wordpress"></i> WordPress HTML Block</h5>
+                    <p class="text-muted">Sử dụng cho WordPress với Gutenberg editor:</p>
+                    <div class="code-container">
+                        <pre><code id="wp-html-block">{{ wordpress_html_block }}</code></pre>
+                        <button class="btn btn-sm btn-outline-primary copy-btn" data-target="wp-html-block">
+                            <i class="fas fa-copy"></i> Sao chép
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Preview -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-eye"></i> Xem trước</h5>
+                    <p class="text-muted">Đây là cách widget sẽ hiển thị trên website của bạn:</p>
+                    <div class="preview-container">
+                        <iframe 
+                            src="{{ url_for('customer.embed') }}" 
+                            width="100%" 
+                            height="400" 
+                            frameborder="0" 
+                            style="border: 1px solid #ddd; border-radius: 8px;">
+                        </iframe>
+                    </div>
+                </div>
+                
+                <!-- Customization Options -->
+                <div class="mb-4">
+                    <h5><i class="fas fa-cogs"></i> Tùy chỉnh</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="iframe-width" class="form-label">Chiều rộng:</label>
+                                <input type="text" id="iframe-width" class="form-control" value="100%" placeholder="800px hoặc 100%">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="iframe-height" class="form-label">Chiều cao:</label>
+                                <input type="text" id="iframe-height" class="form-control" value="600" placeholder="600">
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="updateCustomCode()">
+                        <i class="fas fa-sync"></i> Cập nhật mã
+                    </button>
+                </div>
+                
+                <!-- Custom HTML Code -->
+                <div class="mb-4" id="custom-code-section" style="display: none;">
+                    <h5><i class="fas fa-edit"></i> Mã tùy chỉnh</h5>
+                    <div class="code-container">
+                        <pre><code id="custom-html-code"></code></pre>
+                        <button class="btn btn-sm btn-outline-primary copy-btn" data-target="custom-html-code">
+                            <i class="fas fa-copy"></i> Sao chép
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Hướng dẫn sử dụng
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-globe"></i> Website HTML</h6>
+                        <ol class="text-muted">
+                            <li>Sao chép mã HTML chuẩn</li>
+                            <li>Dán vào vị trí muốn hiển thị widget</li>
+                            <li>Lưu và kiểm tra trang web</li>
+                        </ol>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fab fa-wordpress"></i> WordPress</h6>
+                        <ol class="text-muted">
+                            <li>Cài đặt plugin iframe (nếu cần)</li>
+                            <li>Sao chép shortcode hoặc HTML block</li>
+                            <li>Dán vào bài viết/trang</li>
+                            <li>Xuất bản và kiểm tra</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>Lưu ý:</strong> Widget sẽ tự động cập nhật khi hệ thống có thay đổi. 
+                    Không cần thay đổi mã nhúng sau khi đã tích hợp.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.code-container {
+    position: relative;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.code-container pre {
+    margin: 0;
+    padding: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 0.9rem;
+    color: #495057;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.code-container .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+}
+
+.preview-container {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #f8f9fa;
+}
+
+.alert {
+    border-left: 4px solid;
+}
+
+.alert-info {
+    border-left-color: #17a2b8;
+}
+</style>
+
+<script>
+// Copy to clipboard functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const copyButtons = document.querySelectorAll('.copy-btn');
+    
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                // Create a temporary textarea
+                const textarea = document.createElement('textarea');
+                textarea.value = targetElement.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    
+                    // Update button text
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> Đã sao chép';
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-success');
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.classList.remove('btn-success');
+                        this.classList.add('btn-outline-primary');
+                    }, 2000);
+                    
+                } catch (err) {
+                    console.error('Could not copy text: ', err);
+                }
+                
+                document.body.removeChild(textarea);
+            }
+        });
+    });
+});
+
+// Update custom code
+function updateCustomCode() {
+    const width = document.getElementById('iframe-width').value || '100%';
+    const height = document.getElementById('iframe-height').value || '600';
+    const appUrl = '{{ app_url }}';
+    
+    const customCode = `<!-- Mát Mát Lookup Widget -->
+<iframe 
+    src="${appUrl}customer/embed" 
+    width="${width}" 
+    height="${height}" 
+    frameborder="0" 
+    style="border: 1px solid #ddd; border-radius: 8px; max-width: 800px;">
+</iframe>
+<!-- End Mát Mát Lookup Widget -->`;
+    
+    document.getElementById('custom-html-code').textContent = customCode;
+    document.getElementById('custom-code-section').style.display = 'block';
+}
+</script>
+{% endblock %}

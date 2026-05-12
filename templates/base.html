@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi" style="background: #FF6B35 !important; background: linear-gradient(135deg, #FF6B35 0%, #1E3A8A 100%) !important; background-size: 100% 100% !important; background-repeat: no-repeat !important; background-attachment: scroll !important; background-position: 0 0 !important; width: 100vw !important; height: 100vh !important; min-height: 100vh !important; min-height: -webkit-fill-available !important; margin: 0 !important; padding: 0 !important;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>{% block title %}Mát Mát Tiệm Chu Du{% endblock %}</title>
+    
+    <!-- Performance optimization -->
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="{{ url_for('static', filename='css/style.css') }}" as="style">
+    <link rel="preload" href="{{ url_for('static', filename='js/main.js') }}" as="script">
+    <link rel="prefetch" href="{{ url_for('static', filename='js/interactive-background.js') }}">
+    <link rel="prefetch" href="{{ url_for('static', filename='js/performance-optimizer.js') }}">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}?v={{ range(10000, 99999) | random }}" rel="stylesheet">
+    
+    <!-- Meta tags -->
+    <meta name="description" content="Hệ thống tra cứu thông tin khách hàng và vận đơn của Mát Mát Tiệm Chu Du">
+    <meta name="keywords" content="tra cứu, khách hàng, vận đơn, Mát Mát">
+    <meta name="author" content="Mát Mát Tiệm Chu Du">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Mát Mát - Tra cứu thông tin">
+    <meta property="og:description" content="Hệ thống tra cứu thông tin khách hàng và vận đơn">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/mat-mat-logo.png') }}">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    
+    {% block head %}{% endblock %}
+</head>
+<body style="background: #FF6B35 !important; background: linear-gradient(135deg, #FF6B35 0%, #1E3A8A 100%) !important; background-size: 100% 100% !important; background-repeat: no-repeat !important; background-attachment: scroll !important; background-position: 0 0 !important; width: 100vw !important; height: 100vh !important; min-height: 100vh !important; min-height: -webkit-fill-available !important; margin: 0 !important; padding: 0 !important;">
+    <!-- Header - Hidden for welcome page -->
+    {% if request.path != '/' %}
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="{{ url_for('welcome') }}" class="logo">
+                    <img src="{{ url_for('static', filename='images/mat-mat-logo.png') }}" alt="Mát Mát Logo" class="logo-image">
+                    <span class="logo-text">Mát Mát Tiệm Chu Du</span>
+                </a>
+                
+                <div class="nav-container">
+                    <nav class="nav">
+                        <a href="{{ url_for('welcome') }}" class="nav-link {{ 'active' if request.endpoint == 'welcome' else '' }}">
+                            <i class="fas fa-home"></i>
+                            Trang chủ
+                        </a>
+                        <a href="{{ url_for('customer.index') }}" class="nav-link {{ 'active' if request.endpoint and 'customer' in request.endpoint else '' }}">
+                            <i class="fas fa-users"></i>
+                            Khách hàng
+                        </a>
+                        <a href="{{ url_for('tracking.index') }}" class="nav-link {{ 'active' if request.endpoint and 'tracking' in request.endpoint else '' }}">
+                            <i class="fas fa-shipping-fast"></i>
+                            Vận đơn
+                        </a>
+                        <a href="{{ url_for('booking.index') }}" class="nav-link {{ 'active' if request.endpoint and 'booking' in request.endpoint else '' }}">
+                            <i class="fas fa-calendar-check"></i>
+                            Booking
+                        </a>
+                    </nav>
+                    
+                    <a href="https://tiemchudu.com" target="_blank" class="chu-du-btn">
+                        <i class="fas fa-external-link-alt"></i>
+                        Đi đến Chu Du Verse
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    {% endif %}
+
+    <!-- Alert container -->
+    <div id="alert-container" class="container mt-3"></div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'error' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+
+
+    <!-- Main content -->
+    <main class="main-content {% if request.path == '/' %}welcome-page{% endif %}" {% if request.path == '/' %}style="margin-top:0!important;padding-top:0!important;"{% endif %}>
+        <div class="container" {% if request.path == '/' %}style="margin-top:0!important;padding-top:0!important;"{% endif %}>
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Mát Mát Tiệm Chu Du</h5>
+                    <p>Hệ thống tra cứu thông tin khách hàng và vận đơn</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 Mát Mát Tiệm Chu Du. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+    // Unregister any stale service workers and reload once to get fresh content
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+            var unregPromises = regs.map(function(reg) { return reg.unregister(); });
+            Promise.all(unregPromises).then(function() {
+                if (!sessionStorage.getItem('sw_v3')) {
+                    sessionStorage.setItem('sw_v3', '1');
+                    window.location.reload(true);
+                }
+            });
+        });
+    }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/performance-optimizer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/coupon-system.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cursor.js') }}?v={{ range(1, 99999) | random }}"></script>
+    <script src="{{ url_for('static', filename='js/interactive-background.js') }}?v={{ range(1, 99999) | random }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+
+    <!-- Error handling -->
+    {% if error_message %}
+        <div class="container mt-3">
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                {{ error_message }}
+            </div>
+        </div>
+    {% endif %}
+</body>
+</html>

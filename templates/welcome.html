@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Mát Mát Tiệm Chu Du - Trang chủ{% endblock %}
+
+{% block content %}
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem;box-sizing:border-box;text-align:center;">
+    <img src="{{ url_for('static', filename='images/mat-mat-logo.png') }}" alt="Mát Mát Logo" style="width:90px;height:90px;border-radius:50%;object-fit:cover;box-shadow:0 8px 30px rgba(0,0,0,0.3);margin-bottom:1.2rem;">
+    <h1 style="font-size:1.6rem;font-weight:800;color:white;text-shadow:0 3px 6px rgba(0,0,0,0.6);line-height:1.3;margin-bottom:0.5rem;">
+        Xin chào Mát Mát nè!
+    </h1>
+    <p style="color:rgba(255,255,255,0.75);font-size:0.95rem;margin-bottom:2rem;">
+        Hôm nay bạn muốn làm gì?
+    </p>
+    <a href="{{ url_for('booking.index') }}" class="service-button" style="opacity:1 !important;">
+        <div class="service-button-icon">
+            <i class="fas fa-edit"></i>
+        </div>
+        <div class="service-button-text">
+            Điền Form Booking/Order
+        </div>
+    </a>
+</div>
+
+<!-- Voucher Popup Modal -->
+<div id="voucherModal" class="voucher-modal" style="display: none;">
+    <div class="voucher-popup">
+        <div class="voucher-header">
+            <i class="fas fa-gift voucher-gift-icon"></i>
+            <h3>🐝 Chúc mừng! Bạn nhận được voucher!</h3>
+        </div>
+        
+        <div class="voucher-discount">
+            Giảm 40k
+        </div>
+        
+        <div class="voucher-code-container">
+            <div class="voucher-code" id="voucherCode">KHUYENMAI40</div>
+        </div>
+        
+        <div class="voucher-expiry">
+            <i class="fas fa-clock"></i>
+            Hạn sử dụng: 30 ngày từ hôm nay
+        </div>
+        
+        <div class="voucher-actions">
+            <button class="voucher-btn voucher-btn-copy" onclick="copyVoucherCode()">
+                <i class="fas fa-copy"></i>
+                COPY MÃ
+            </button>
+            <button class="voucher-btn voucher-btn-close" onclick="closeVoucherModal()">
+                <i class="fas fa-times"></i>
+                ĐÓNG
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Force reset all pushed margins on welcome page
+(function() {
+    function fixLayout() {
+        var main = document.querySelector('main');
+        var container = document.querySelector('main .container');
+        if (main) { main.style.setProperty('margin-top', '0', 'important'); main.style.setProperty('padding-top', '0', 'important'); }
+        if (container) { container.style.setProperty('margin-top', '0', 'important'); container.style.setProperty('padding-top', '0', 'important'); }
+    }
+    fixLayout();
+    document.addEventListener('DOMContentLoaded', fixLayout);
+    window.addEventListener('load', fixLayout);
+})();
+
+// Add interactive animations for service buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.service-button');
+    const serviceButtons = document.querySelector('.service-buttons');
+    
+    buttons.forEach((button, index) => {
+        button.style.animationDelay = `${index * 0.3}s`;
+        button.style.animation = 'fadeInUp 0.8s ease forwards';
+    });
+
+    // Custom cursor is now handled by the universal cursor system
+
+    // Add ripple effect on button click
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+            ripple.classList.add('ripple');
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // All buttons now use proper URLs, no need for custom handling
+    
+    // Easter Egg: 4 Corner Click Detection
+    let cornerClicks = [];
+    const cornerSize = 50; // 50px corner area
+    
+    document.addEventListener('click', function(e) {
+        const x = e.clientX;
+        const y = e.clientY;
+        const winWidth = window.innerWidth;
+        const winHeight = window.innerHeight;
+        
+        // Check if click is in any corner
+        let corner = null;
+        if (x <= cornerSize && y <= cornerSize) {
+            corner = 'top-left';
+        } else if (x >= winWidth - cornerSize && y <= cornerSize) {
+            corner = 'top-right';
+        } else if (x <= cornerSize && y >= winHeight - cornerSize) {
+            corner = 'bottom-left';
+        } else if (x >= winWidth - cornerSize && y >= winHeight - cornerSize) {
+            corner = 'bottom-right';
+        }
+        
+        if (corner) {
+            // Add to corner clicks with timestamp
+            cornerClicks.push({
+                corner: corner,
+                timestamp: Date.now()
+            });
+            
+            // Keep only clicks from last 10 seconds
+            cornerClicks = cornerClicks.filter(click => 
+                Date.now() - click.timestamp < 10000
+            );
+            
+            // Check if all 4 corners have been clicked
+            const uniqueCorners = [...new Set(cornerClicks.map(click => click.corner))];
+            if (uniqueCorners.length === 4) {
+                showVoucherModal();
+                cornerClicks = []; // Reset
+            }
+        }
+    });
+});
+
+// Voucher Modal Functions
+function showVoucherModal() {
+    const modal = document.getElementById('voucherModal');
+    modal.style.display = 'flex';
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+}
+
+function closeVoucherModal() {
+    const modal = document.getElementById('voucherModal');
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+function copyVoucherCode() {
+    const code = document.getElementById('voucherCode').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        const copyBtn = document.querySelector('.voucher-btn-copy');
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> ĐÃ COPY!';
+        copyBtn.style.background = '#28a745';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.background = '#28a745';
+        }, 2000);
+    }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = code;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        const copyBtn = document.querySelector('.voucher-btn-copy');
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> ĐÃ COPY!';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+        }, 2000);
+    });
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('voucherModal');
+    if (e.target === modal) {
+        closeVoucherModal();
+    }
+});
+
+// Add CSS animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .service-button {
+        opacity: 0;
+    }
+    
+
+    
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+        pointer-events: none;
+    }
+    
+    @keyframes ripple {
+        to {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

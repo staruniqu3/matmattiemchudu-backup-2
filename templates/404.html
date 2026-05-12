@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Trang không tìm thấy - Mát Mát Tiệm Chu Du{% endblock %}
+
+{% block content %}
+<div class="error-section">
+    <div class="text-center">
+        <div class="error-logo-container">
+            <img src="{{ url_for('static', filename='images/mat-mat-logo.png') }}" alt="Mát Mát Logo" class="error-logo">
+        </div>
+        
+        <h1 class="error-title">
+            Mát Mát đang đi du lịch 1 ngày.
+        </h1>
+        
+        <p class="error-subtitle">
+            Hai đứa sẽ trở lại vào ngày mai, hẹn gặp các bạn vào ngày mai nhé.
+        </p>
+        
+        <div class="error-actions">
+            <a href="{{ url_for('welcome') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-home"></i>
+                Trở về trang chủ
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Add gentle floating animation to the logo
+document.addEventListener('DOMContentLoaded', function() {
+    const logo = document.querySelector('.error-logo');
+    if (logo) {
+        logo.style.animation = 'gentleFloat 3s ease-in-out infinite';
+    }
+});
+
+// Add CSS for 404 page
+const style = document.createElement('style');
+style.textContent = `
+    .error-section {
+        text-align: center;
+        padding: 4rem 1rem;
+        min-height: calc(100vh - 200px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .error-logo-container {
+        margin-bottom: 2rem;
+        animation: fadeInUp 0.8s ease forwards;
+    }
+    
+    .error-logo {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+    }
+    
+    .error-logo:hover {
+        transform: scale(1.05);
+    }
+    
+    .error-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+        line-height: 1.2;
+        animation: fadeInUp 0.8s ease forwards 0.2s;
+        opacity: 0;
+        animation-fill-mode: forwards;
+    }
+    
+    .error-subtitle {
+        font-size: 1.3rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 3rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        animation: fadeInUp 0.8s ease forwards 0.4s;
+        opacity: 0;
+        animation-fill-mode: forwards;
+    }
+    
+    .error-actions {
+        animation: fadeInUp 0.8s ease forwards 0.6s;
+        opacity: 0;
+        animation-fill-mode: forwards;
+    }
+    
+    @keyframes gentleFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .error-title {
+            font-size: 2.2rem;
+        }
+        
+        .error-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .error-logo {
+            width: 120px;
+            height: 120px;
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

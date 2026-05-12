@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Order/Pickup - Mát Mát Tiệm Chu Du{% endblock %}
+
+{% block content %}
+<div class="booking-section">
+    <div class="text-center mb-5">
+        <div class="welcome-logo-container">
+            <img src="{{ url_for('static', filename='images/mat-mat-logo.png') }}" alt="Mát Mát Logo" class="welcome-logo">
+        </div>
+        <h1 class="welcome-greeting">
+            Order/Pickup
+        </h1>
+        <p class="welcome-subtitle">
+            Chọn dịch vụ bạn cần
+        </p>
+    </div>
+    
+    <div class="service-buttons">
+        <a href="https://forms.gle/CTqRkz188546x7je9" target="_blank" class="service-button">
+            <div class="service-button-icon">
+                <i class="fas fa-edit"></i>
+            </div>
+            <div class="service-button-text">
+                Điền Form Order
+            </div>
+        </a>
+        
+        <a href="https://tiemchudu.com/order-pickup-goods/" target="_blank" class="service-button">
+            <div class="service-button-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="service-button-text">
+                Quy định Order
+            </div>
+        </a>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('booking.index') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>
+            Quay lại
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Add interactive animations for service buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.service-button');
+    
+    buttons.forEach((button, index) => {
+        button.style.animationDelay = `${index * 0.3}s`;
+        button.style.animation = 'fadeInUp 0.8s ease forwards';
+    });
+
+    // Add ripple effect on button click
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+            ripple.classList.add('ripple');
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+});
+
+// Add CSS animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .service-button {
+        opacity: 0;
+    }
+    
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+        pointer-events: none;
+    }
+    
+    @keyframes ripple {
+        to {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}
